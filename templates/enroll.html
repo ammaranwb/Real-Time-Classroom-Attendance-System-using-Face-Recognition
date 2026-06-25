@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card p-4">
+      <h4 class="mb-4"><i class="bi bi-person-plus-fill me-2 text-success"></i>Enroll New User</h4>
+
+      <div class="row g-4">
+        <!-- Camera Preview -->
+        <div class="col-md-6 text-center">
+          <div class="border rounded overflow-hidden" style="background:#000;">
+            <img src="/enroll_feed" width="100%" alt="Camera Feed" id="cam-feed"/>
+          </div>
+          <small class="text-muted">Position your face inside the green box</small>
+        </div>
+
+        <!-- Form -->
+        <div class="col-md-6">
+          <form method="POST" action="/enroll">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Full Name</label>
+              <input type="text" name="name" class="form-control form-control-lg"
+                     placeholder="e.g. John Smith" required autofocus/>
+              <div class="form-text">This name will appear on attendance records.</div>
+            </div>
+
+            <div class="alert alert-info py-2">
+              <i class="bi bi-info-circle me-1"></i>
+              Make sure your face is clearly visible and well-lit before capturing.
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="bi bi-camera-fill me-2"></i>Capture & Enroll
+            </button>
+            <a href="/" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

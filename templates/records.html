@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="mb-0"><i class="bi bi-table me-2 text-success"></i>Attendance Records</h4>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <!-- Date Filter -->
+      <form method="GET" action="/records" class="d-flex gap-2">
+        <input type="date" name="date" class="form-control" value="{{ filter_date }}"/>
+        <button type="submit" class="btn btn-outline-secondary">Filter</button>
+        <a href="/records" class="btn btn-outline-secondary">Clear</a>
+      </form>
+
+      <!-- Export -->
+      <a href="/export_csv{% if filter_date %}?date={{ filter_date }}{% endif %}"
+         class="btn btn-success">
+        <i class="bi bi-download me-1"></i>Export CSV
+      </a>
+    </div>
+  </div>
+
+  {% if logs %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th><i class="bi bi-person me-1"></i>Name</th>
+            <th><i class="bi bi-calendar me-1"></i>Date</th>
+            <th><i class="bi bi-clock me-1"></i>Time</th>
+            <th><i class="bi bi-speedometer2 me-1"></i>Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td class="text-muted">{{ log['id'] }}</td>
+            <td><strong>{{ log['user_name'] }}</strong></td>
+            <td>{{ log['date'] }}</td>
+            <td>{{ log['time'] }}</td>
+            <td>
+              {% set conf = log['confidence']|float %}
+              <span class="badge {% if conf >= 75 %}bg-success{% elif conf >= 55 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                {{ log['confidence'] }}%
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-muted small">Showing {{ logs|length }} record(s)</div>
+
+  {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+      No records found{% if filter_date %} for {{ filter_date }}{% endif %}.
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
