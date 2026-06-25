@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-9">
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-camera-fill me-2 text-success"></i>Live Attendance</h4>
+        <span class="badge bg-danger" id="status-badge">Stopped</span>
+      </div>
+
+      <!-- Video Feed -->
+      <div class="text-center border rounded overflow-hidden mb-3" style="background:#000; min-height:400px;">
+        <img id="video-feed" src="" width="100%" alt="Camera feed will appear here"/>
+      </div>
+
+      <!-- Controls -->
+      <div class="d-flex gap-3 justify-content-center">
+        <button class="btn btn-success btn-lg px-5" id="btn-start" onclick="startRecognition()">
+          <i class="bi bi-play-fill me-2"></i>Start
+        </button>
+        <button class="btn btn-danger btn-lg px-5" id="btn-stop" onclick="stopRecognition()" disabled>
+          <i class="bi bi-stop-fill me-2"></i>Stop
+        </button>
+        <a href="/records" class="btn btn-outline-secondary btn-lg">
+          <i class="bi bi-table me-1"></i>View Records
+        </a>
+      </div>
+
+      <div class="alert alert-success mt-3 py-2 text-center" id="marked-alert" style="display:none;">
+        <i class="bi bi-check-circle me-1"></i><span id="marked-name"></span> — Attendance Marked!
+      </div>
+
+      <p class="text-muted text-center mt-3 small">
+        <i class="bi bi-info-circle me-1"></i>
+        The system recognizes faces automatically. Attendance is logged once per person per day.
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let markedToday = new Set();
+
+function startRecognition() {
+  document.getElementById('video-feed').src = '/attendance_feed';
+  document.getElementById('status-badge').textContent = 'Running';
+  document.getElementById('status-badge').className = 'badge bg-success';
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-stop').disabled = false;
+
+  // Poll today's count to detect new markings
+  pollAttendance();
+}
+
+function stopRecognition() {
+  fetch('/stop_recognition', { method: 'POST' });
+  document.getElementById('video-feed').src = '';
+  document.getElementById('status-badge').textContent = 'Stopped';
+  document.getElementById('status-badge').className = 'badge bg-danger';
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-stop').disabled = true;
+}
+
+function pollAttendance() {
+  fetch('/today_count')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('today-count-live') &&
+        (document.getElementById('today-count-live').textContent = d.count);
+    });
+
+  if (!document.getElementById('btn-stop').disabled) {
+    setTimeout(pollAttendance, 3000);
+  }
+}
+</script>
+{% endblock %}
